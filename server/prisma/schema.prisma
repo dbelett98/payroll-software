@@ -49,8 +49,10 @@ model Client {
   updatedAt    DateTime   @updatedAt
 
   // Relationships: Linked to a User (client login), has many Employees and PayrollRuns.
+  // Fix for P1012: Added @unique to userId to satisfy one-to-one relation requirements.
+  // This ensures each userId is unique in the clients table (prevents duplicates).
   user         User?      @relation(fields: [userId], references: [id])
-  userId       Int?       // Foreign key to User.
+  userId       Int?       @unique  // Foreign key to User, now unique for 1:1 relation.
   employees    Employee[]
   payrollRuns  PayrollRun[]
 
