@@ -1,0 +1,19 @@
+# .gitignore: Ignores unnecessary files to keep repo clean (open-source Git feature, zero cost).
+# Node modules (regenerate with npm install).
+node_modules/
+*/node_modules/  # For subfolders like client/server.
+
+# Build outputs (e.g., React build).
+client/build/
+
+# Environment files (security: don't commit secrets).
+.env
+*/.env
+
+# Prisma migrations temp files (optional, but good practice).
+prisma/dev.db
+prisma/migrations/
+
+# Logs and temp files.
+*.log
+.DS_Store  # For macOS, if applicable.
