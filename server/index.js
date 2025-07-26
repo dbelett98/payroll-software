@@ -4,10 +4,12 @@ const { passport, generateToken, authenticateJWT } = require('./auth');  // Impo
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();  
 const bcrypt = require('bcryptjs');  // For registration hashing
+const cors = require('cors');  // cross-origin requests from client on 3001
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors({ origin: 'http://localhost:3001' }));  // Allow requests from client port (configurable for production).
 app.use(express.json());  // Parse JSON bodies (Express middleware)
 app.use(passport.initialize());  // Initialize Passport
 
