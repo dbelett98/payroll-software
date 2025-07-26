@@ -5,6 +5,7 @@ const { passport, generateToken, authenticateJWT } = require('./auth');  // Impo
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();  // Free Prisma.
 const bcrypt = require('bcryptjs');  // For registration hashing.
+const defineAbilitiesFor = require('./rbac');  // Import from rbac.js
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -40,6 +41,14 @@ app.post('/login', (req, res, next) => {
 // Protected Route Example: GET /protected (requires JWT; for testing).
 app.get('/protected', authenticateJWT, (req, res) => {
   res.json({ message: 'Protected content', user: req.user });  // Accessible only with valid token.
+});
+
+// Protected Route Example: GET /protected (requires JWT and RBAC check).
+app.get('/protected', authenticateJWT, (req, res) => {
+  const ability = defineAbilitiesFor(req.user);  // Define abilities based on user role from JWT (free CASL call).
+  if (!ability.can('read', 'Protected')) return res.status(403).json({ message: 'Forbidden - Insufficient permissions' });  // Check permission (free, denies if cannot).
+
+  res.json({ message: 'Protected content accessed', user: req.user });  // Success if allowed (free response).
 });
 
 // Existing root route (unchanged).
