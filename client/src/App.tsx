@@ -1,7 +1,7 @@
 // App.tsx: Main React app component (updated to render LoginForm for auth integration, free open-source React).
 import React from 'react';
-import './App.css';  // Default styles 
-import LoginForm from './LoginForm';  // Import the new form component 
+import './App.css';  // Default styles (free).
+import LoginForm from './LoginForm';  // Import the new form component (local, free).
 
 function App() {
   return (

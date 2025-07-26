@@ -2,7 +2,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';  // Free form handling lib.
 import axios from 'axios';  // Free for API calls.
-import { jwtDecode } from 'jwt-decode';  // Corrected: Named import for the function (free, fixes callable error).
+import { jwtDecode } from 'jwt-decode';  // Free for decoding token (named import).
 
 interface LoginData {
   email: string;
@@ -19,7 +19,7 @@ const LoginForm: React.FC = () => {
       localStorage.setItem('token', token);  // Store JWT locally (free browser storage).
       console.log('Login successful');  // Redirect or update UI here.
 
-      // Decode token for role (free jwt-decode, now with correct import).
+      // Decode token for role (free jwt-decode).
       const decoded = jwtDecode<{ role: string }>(token);  // Decode to get role.
       console.log('Role:', decoded.role);  // Use for conditional UI (e.g., if (decoded.role === 'STAFF') window.location = '/staff-dashboard').
     } catch (error) {
