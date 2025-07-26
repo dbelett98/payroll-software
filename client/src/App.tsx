@@ -1,23 +1,14 @@
+// App.tsx: Main React app component (updated to render LoginForm for auth integration, free open-source React).
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './App.css';  // Default styles 
+import LoginForm from './LoginForm';  // Import the new form component 
 
 function App() {
   return (
-    <div className="App">
+    <div className="App">  // Wrapper with Tailwind classes if needed (free styling).
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>PSB Payroll Login</h1>  // Simple header (customize as needed).
+        <LoginForm />  // Render the login form here (connects to backend via Axios, free).
       </header>
     </div>
   );
