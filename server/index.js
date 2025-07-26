@@ -1,26 +1,25 @@
-// index.js: Main Express server file (updated for auth routes)
-const express = require('express');  // Open-source Express 
-const { passport, generateToken, authenticateJWT } = require('./auth');  // Import from auth.js
+// index.js: Main Express server file (updated for auth routes, body parsing to fix 400, and CORS – free open-source Express).
+const express = require('express');  // Open-source Express (free).
+const cors = require('cors');  // Free open-source CORS middleware (if installed; fixes cross-port if needed).
+const { passport, generateToken, authenticateJWT } = require('./auth');  // Import from auth.js.
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();  
-const bcrypt = require('bcryptjs');  // For registration hashing
-const cors = require('cors');  // cross-origin requests from client on 3001
-const defineAbilitiesFor = require('./rbac');  // Import from rbac.js.
+const prisma = new PrismaClient();  // Free Prisma.
+const bcrypt = require('bcryptjs');  // For registration hashing.
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: 'http://localhost:3001' }));  // Allow requests from client port (configurable for production).
-app.use(express.json());  // Parse JSON bodies (Express middleware)
-app.use(passport.initialize());  // Initialize Passport
+app.use(cors({ origin: 'http://localhost:3001' }));  // Free CORS for client on 3001 (add this first if not present).
+app.use(express.json());  // Free body parser for JSON requests (fixes 400 Bad Request on POST – add before routes).
+app.use(passport.initialize());  // Initialize Passport (free).
 
-// Register Route: POST /register (creates new user)
+// Register Route: POST /register (creates new user).
 app.post('/register', async (req, res) => {
-  const { email, password, role } = req.body;  // Extract from request
+  const { email, password, role } = req.body;  // Extract from request (now parsed via express.json()).
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);  // Hash password (10 salt rounds)
+    const hashedPassword = await bcrypt.hash(password, 10);  // Hash password (free, 10 salt rounds).
     const user = await prisma.user.create({
-      data: { email, password: hashedPassword, role }  // Insert into DB ( Prisma).
+      data: { email, password: hashedPassword, role }  // Insert into DB (free Prisma).
     });
     res.status(201).json({ message: 'User created', userId: user.id });  // Success response.
   } catch (error) {
@@ -28,23 +27,19 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Login Route: POST /login (authenticates and returns JWT).
-app.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
-  const token = generateToken(req.user);  // Generate JWT (from auth.js).
-  res.json({ token });  // Return token for client storage.
+// Login Route: POST /login (authenticates and returns JWT, with custom error handling to avoid generic 400).
+app.post('/login', (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err) return next(err);  // Handle internal errors.
+    if (!user) return res.status(401).json({ message: info ? info.message : 'Invalid credentials' });  // Custom 401 for failures (free override of 400).
+    const token = generateToken(user);  // Generate JWT (from auth.js).
+    res.json({ token });  // Return token for client storage.
+  })(req, res, next);
 });
 
 // Protected Route Example: GET /protected (requires JWT; for testing).
 app.get('/protected', authenticateJWT, (req, res) => {
   res.json({ message: 'Protected content', user: req.user });  // Accessible only with valid token.
-});
-
-// Example protected route with RBAC
-app.get('/dashboard', authenticateJWT, (req, res) => {
-  const ability = defineAbilitiesFor(req.user);  // Get abilities based on role (free CASL).
-  if (!ability.can('read', 'Dashboard')) return res.status(403).json({ message: 'Forbidden' });
-
-  res.json({ message: 'Dashboard access granted' });  // Proceed if allowed.
 });
 
 // Existing root route (unchanged).
