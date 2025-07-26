@@ -5,6 +5,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();  
 const bcrypt = require('bcryptjs');  // For registration hashing
 const cors = require('cors');  // cross-origin requests from client on 3001
+const defineAbilitiesFor = require('./rbac');  // Import from rbac.js.
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -36,6 +37,14 @@ app.post('/login', passport.authenticate('local', { session: false }), (req, res
 // Protected Route Example: GET /protected (requires JWT; for testing).
 app.get('/protected', authenticateJWT, (req, res) => {
   res.json({ message: 'Protected content', user: req.user });  // Accessible only with valid token.
+});
+
+// Example protected route with RBAC
+app.get('/dashboard', authenticateJWT, (req, res) => {
+  const ability = defineAbilitiesFor(req.user);  // Get abilities based on role (free CASL).
+  if (!ability.can('read', 'Dashboard')) return res.status(403).json({ message: 'Forbidden' });
+
+  res.json({ message: 'Dashboard access granted' });  // Proceed if allowed.
 });
 
 // Existing root route (unchanged).
