@@ -59,3 +59,17 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+//  (updated with /clients route for dashboard – free open-source Express/Prisma).
+// ... (existing imports and app setup)
+
+app.get('/clients', authenticateJWT, async (req, res) => {
+  try {
+    const clients = await prisma.client.findMany({
+      where: { userId: req.user.id }  // Fetch clients for the logged-in user (free Prisma query, RBAC via JWT role if needed).
+    });
+    res.json(clients);  // Return client list (free response).
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching clients', error });  // Handle errors (free).
+  }
+});
