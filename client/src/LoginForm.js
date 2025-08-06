@@ -1,32 +1,22 @@
-// LoginForm.tsx: React component for login form (updated for role check after login – free open-source React/jwt-decode).
+// LoginForm.js: React component for login form (updated with onLoginSuccess prop for App state update – free open-source React).
 import React from 'react';
 import { useForm } from 'react-hook-form';  // Free form handling lib.
 import axios from 'axios';  // Free for API calls.
 import { jwtDecode } from 'jwt-decode';  // Free for decoding token.
 
-interface LoginData {
-  email: string;
-  password: string;
-}
+const LoginForm = ({ onLoginSuccess }) => {
+  const { register, handleSubmit } = useForm();
 
-const LoginForm: React.FC = () => {
-  const { register, handleSubmit } = useForm<LoginData>();  // Hook for form state (free).
-
-  const onSubmit = async (data: LoginData) => {
+  const onSubmit = async (data) => {
     try {
       const response = await axios.post('http://localhost:3000/login', data);  // Call backend API (free).
       const token = response.data.token;  // Extract token from response.
       localStorage.setItem('token', token);  // Store JWT locally (free browser storage).
       console.log('Login successful');  // Log success (free).
 
-      const decoded = jwtDecode<{ id: number; role: string }>(token);  // Decode token to get role (free jwt-decode).
+      const decoded = jwtDecode(token);  // Decode token to get role (free).
       console.log('Role:', decoded.role);  // Log role for debugging (free).
-      // Role-based redirect (free window.location; expand with react-router later for SPA navigation).
-      if (decoded.role === 'STAFF' || decoded.role === 'ADMIN') {
-        window.location.href = '/staff-dashboard';  // Redirect to staff view (placeholder, free).
-      } else if (decoded.role === 'CLIENT') {
-        window.location.href = '/client-dashboard';  // Redirect to client view (free).
-      }
+      onLoginSuccess();  // Call prop to update App state (free, triggers dashboard render).
     } catch (error) {
       console.error('Login failed', error);  // Handle errors (free).
     }
