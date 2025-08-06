@@ -73,3 +73,15 @@ app.get('/clients', authenticateJWT, async (req, res) => {
     res.status(500).json({ message: 'Error fetching clients', error });  // Handle errors (free).
   }
 });
+
+app.get('/employees', authenticateJWT, async (req, res) => {
+  const { clientId } = req.query;  // Get clientId from query (free).
+  try {
+    const employees = await prisma.employee.findMany({
+      where: { clientId: parseInt(clientId) }  // Fetch for specific client (free Prisma query).
+    });
+    res.json(employees);  // Return list (free).
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employees', error });  // Handle errors (free).
+  }
+});
