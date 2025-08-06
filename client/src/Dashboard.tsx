@@ -25,8 +25,8 @@ const Dashboard: React.FC = () => {
     if (token) {
       axios.get('http://localhost:3000/clients', {
         headers: { Authorization: `Bearer ${token}` }  // Send JWT for auth (free axios config).
-      }).then(response => setClients(response.data))  // Set clients (free).
-        .catch(error => console.error('Error fetching clients', error));  // Handle errors (free).
+      }).then((response: any) => setClients(response.data))  // Set clients (explicit 'any' type for response – free fix for implicit 'any').
+        .catch((error: any) => console.error('Error fetching clients', error));  // Handle errors (explicit 'any' type for error – free).
     }
   }, []);
 
@@ -58,17 +58,17 @@ const Dashboard: React.FC = () => {
   return (
     <div className="p-4">
       <h2>Staff Dashboard</h2> {/* Header (free). */}
-      <select onChange={(e) => {
+      <select onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {  // Explicit type for 'e' (free TS annotation to fix implicit 'any').
         const id = parseInt(e.target.value);
         setSelectedClient(id);
         fetchEmployees(id);  // Fetch on selection (free event handler).
       }} className="mb-4 p-2 border">
         <option value="">Select Client</option>
-        {clients.map(client => <option key={client.id} value={client.id}>{client.name}</option>)} {/* Dropdown from clients (free map). */}
+        {clients.map((client: Client) => <option key={client.id} value={client.id}>{client.name}</option>)} {/* Dropdown from clients (free map; explicit type for 'client'). */}
       </select>
       <table className="w-full border">
-        <thead><tr>{table.getHeaderGroups().map(headerGroup => headerGroup.headers.map(header => <th key={header.id}>{header.renderHeader()}</th>))}</tr></thead> {/* Table headers (free react-table). */}
-        <tbody>{table.getRowModel().rows.map(row => <tr key={row.id}>{row.getVisibleCells().map(cell => <td key={cell.id}>{cell.renderValue()}</td>)}</tr>)}</tbody> {/* Table rows (free). */}
+        <thead><tr>{table.getHeaderGroups().map((headerGroup: any) => headerGroup.headers.map((header: any) => <th key={header.id}>{header.renderHeader()}</th>))}</tr></thead> {/* Table headers (free react-table; explicit 'any' for 'headerGroup' and 'header' to fix implicit 'any'). */}
+        <tbody>{table.getRowModel().rows.map((row: any) => <tr key={row.id}>{row.getVisibleCells().map((cell: any) => <td key={cell.id}>{cell.renderValue()}</td>)}</tr>)}</tbody> {/* Table rows (free; explicit 'any' for 'row' and 'cell' to fix implicit 'any'). */}
       </table>
     </div>
   );
