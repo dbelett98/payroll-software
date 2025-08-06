@@ -1,43 +1,41 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 // schema.prisma: Defines the database schema using Prisma's declarative syntax.
 // This file is used to generate migrations and TypeScript types automatically.
-// Prisma handles SQL under the hood.
+// All definitions are open-source and free; Prisma handles SQL under the hood.
 
 generator client {
-  provider = "prisma-client-js"  // Generates the Prisma Client for Node.js queries
+  provider = "prisma-client-js" // Generates the Prisma Client for Node.js queries (free).
 }
 
 datasource db {
-  provider = "postgresql"  // Specifies PostgreSQL as the database (open-source DB).
-  url      = env("DATABASE_URL")  // Pulls connection string from .env for security.
+  provider = "postgresql" // Specifies PostgreSQL as the database (free, open-source DB).
+  url      = env("DATABASE_URL") // Pulls connection string from .env for security.
 }
 
-// User model: Represents PSB staff (CEO/employees) and clients with role-based access.
-// Includes authentication fields;  add JWT later .
-model User {
-  id        Int      @id @default(autoincrement())  // Auto-incrementing primary key.
-  email     String   @unique  // Unique email for login.
-  password  String   // Hashed password (use bcrypt for security, added later).
-  role      Role     // Enum for roles (e.g., STAFF for full access, CLIENT for limited).
-  createdAt DateTime @default(now())  // Timestamp for creation.
-  updatedAt DateTime @updatedAt  // Auto-updates on changes.
-
-  // Relationships: A user (client) can own a Client business; staff can manage multiple.
-  client    Client?  // Optional one-to-one with Client (for client users).
-
-  @@map("users")  // Maps to 'users' table in DB.
-}
-
-// Enum for user roles: Defines access levels (e.g., STAFF inputs data, CLIENT submits hours).
+// Enum for user roles: Defines access levels (e.g., STAFF inputs data, CLIENT submits hours) – added to fix reference errors.
 enum Role {
   STAFF
   CLIENT
-  ADMIN  // For PSB CEO with extra privileges.
+  ADMIN // For PSB CEO with extra privileges.
+}
+
+// User model: Represents PSB staff (CEO/employees) and clients with role-based access.
+// Includes authentication fields; we'll add JWT later in Step D.
+model User {
+  id        Int      @id @default(autoincrement()) // Auto-incrementing primary key.
+  email     String   @unique // Unique email for login.
+  password  String   // Hashed password (use bcrypt for security, added later).
+  role      Role     // Enum for roles (e.g., STAFF for full access, CLIENT for limited).
+  createdAt DateTime @default(now()) // Timestamp for creation.
+  updatedAt DateTime @updatedAt // Auto-updates on changes.
+
+  // Relationships: A user can have many Clients (one-to-many).
+  clients   Client[] // Relation field for one-to-many (free, consistent with Client model).
+
+  @@map("users") // Maps to 'users' table in DB.
 }
 
 // Client model: Represents business clients of PSB Inc.
@@ -48,11 +46,9 @@ model Client {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  // Relationships: Linked to a User (client login), has many Employees and PayrollRuns.
-  // Fix for P1012: Added @unique to userId to satisfy one-to-one relation requirements.
-  // This ensures each userId is unique in the clients table (prevents duplicates).
-  user         User?      @relation(fields: [userId], references: [id])
-  userId       Int?       @unique  // Foreign key to User, now unique for 1:1 relation.
+  // Relationships: Belongs to a User (one-to-many), has many Employees and PayrollRuns.
+  user         User       @relation(fields: [userId], references: [id]) // Non-optional for one-to-many (consistent relation).
+  userId       Int        // Foreign key to User (no @unique needed for many side).
   employees    Employee[]
   payrollRuns  PayrollRun[]
 
@@ -63,7 +59,7 @@ model Client {
 model Employee {
   id           Int      @id @default(autoincrement())
   name         String   // Employee full name.
-  ssn          String   @unique  // Social Security Number (encrypt in production).
+  ssn          String   @unique // Social Security Number (encrypt in production).
   bankAccount  String?  // Bank details for direct deposits (future ACH integration).
   hourlyRate   Float?   // Hourly rate (for calculations).
   salary       Float?   // Fixed salary (alternative to hourly).
@@ -81,7 +77,7 @@ model Employee {
 // PayrollRun model: Represents a processed payroll batch (e.g., monthly run).
 model PayrollRun {
   id           Int          @id @default(autoincrement())
-  runDate      DateTime     @default(now())  // Date of processing.
+  runDate      DateTime     @default(now()) // Date of processing.
   totalGross   Float        // Total gross pay calculated.
   totalNet     Float        // Total net pay after deductions.
   taxesWithheld Float       // Withheld taxes (for future agency payments).
