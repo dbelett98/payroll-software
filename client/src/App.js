@@ -11,7 +11,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>PSB Payroll</h1>
-        {isLoggedIn ? <Dashboard /> : <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />}  // Conditional render (free, passes callback to LoginForm).
+        {isLoggedIn ? <Dashboard /> : <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />}  // Conditional (free).
       </header>
     </div>
   );

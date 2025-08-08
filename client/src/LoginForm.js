@@ -4,8 +4,8 @@ import { useForm } from 'react-hook-form';  // Free form handling lib.
 import axios from 'axios';  // Free for API calls.
 import { jwtDecode } from 'jwt-decode';  // Free for decoding token.
 
-const LoginForm = ({ onLoginSuccess }) => {
-  const { register, handleSubmit } = useForm();
+function LoginForm({ onLoginSuccess }) {
+  const { register, handleSubmit } = useForm();  // Hook for form state (free).
 
   const onSubmit = async (data) => {
     try {
