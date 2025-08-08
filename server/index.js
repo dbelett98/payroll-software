@@ -66,9 +66,9 @@ app.listen(port, () => {
 app.get('/clients', authenticateJWT, async (req, res) => {
   try {
     const clients = await prisma.client.findMany({
-      where: { userId: req.user.id }  // Fetch clients for the logged-in user (free Prisma query, RBAC via JWT role if needed).
+      where: { userId: req.user.id }  // Fetch clients for logged-in user (free Prisma query, RBAC via JWT).
     });
-    res.json(clients);  // Return client list (free response).
+    res.json(clients);  // Return list (free).
   } catch (error) {
     res.status(500).json({ message: 'Error fetching clients', error });  // Handle errors (free).
   }
