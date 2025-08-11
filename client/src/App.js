@@ -1,17 +1,17 @@
-// App.js: Main React app component (updated to conditionally render Dashboard after login – free open-source React).
+// App.js: Main React app component (renders Dashboard after login – free open-source React).
 import React, { useState } from 'react';
-import './App.css';  // Default styles (free).
-import LoginForm from './LoginForm';  // Import login (free).
-import Dashboard from './Dashboard';  // Import dashboard (free).
+import './App.css';  // Default styles.
+import LoginForm from './LoginForm';  // Import login.
+import Dashboard from './Dashboard';  // Import dashboard.
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));  // Check for token on load (free state hook).
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));  // Check for token on load.
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>PSB Payroll</h1>
-        {isLoggedIn ? <Dashboard /> : <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />}  // Conditional (free).
+        {isLoggedIn ? <Dashboard /> : <LoginForm onLoginSuccess={() => setIsLoggedIn(true)} />}  // Conditional rendering.
       </header>
     </div>
   );
