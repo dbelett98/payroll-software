@@ -1,21 +1,27 @@
-// seed.js: Seeds test data into PostgreSQL via free open-source Prisma (run once for dev to fix 401 on invalid credentials).
+// seed.js: Seeds initial users into the database – free open-source Node.js/Prisma.
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');  // Free hashing (already installed).
+const bcrypt = require('bcrypt');
 
-const prisma = new PrismaClient();  // Free client initialization.
+const prisma = new PrismaClient();
 
 async function main() {
-  const hashedPassword = await bcrypt.hash('testpassword', 10);  // Hash for security (free, 10 salt rounds).
-  await prisma.user.upsert({  // Upsert to avoid duplicates (free Prisma method).
-    where: { email: 'staff@example.com' },  // Check by email.
-    update: {},  // No update if exists.
+  const email = 'staff@example.com';
+  const password = 'testpassword';
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Check if user exists, update or create
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {}, // No updates needed if exists
     create: {
-      email: 'staff@example.com',
+      email,
       password: hashedPassword,
-      role: 'STAFF'  // Test staff user (add more as needed, e.g., for CLIENT role).
-    }
+      role: 'STAFF',
+    },
   });
-  console.log('Test user seeded');  // Confirmation log.
+  console.log('Seeded or updated staff user with ID:', user.id);
 }
 
-main().catch(e => console.error(e)).finally(async () => await prisma.$disconnect());  // Cleanup (free, best practice).
+main()
+  .catch(e => console.error(e))
+  .finally(async () => await prisma.$disconnect());
